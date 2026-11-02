@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Профессия разработчика баз данных: задачи, знания, компании, вакансии и зарплаты."><title>Разработчик баз данных</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap"><style>
+/* Схема: страницы как таблицы базы данных. Шапка с навигацией, контент в одну колонку 1080px,
+   таблицы-карточки с ключами PK/FK как единственный «смелый» мотив. */
+:root{
+  --bg:#F1F4F8; --surface:#FFFFFF; --ink:#172033; --muted:#566176; --line:#D5DBE6;
+  --soft:#E6EDF8; --accent:#1F5FBF; --accent-ink:#FFFFFF; --key:#9A5508;
+  --good:#1E7A46;
+  --font-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1420; --surface:#171E2E; --ink:#E6EAF2; --muted:#9AA5BA; --line:#2A344A;
+    --soft:#1D2740; --accent:#7FAEFF; --accent-ink:#0F1420; --key:#E8A55C; --good:#5CCB8A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1420; --surface:#171E2E; --ink:#E6EAF2; --muted:#9AA5BA; --line:#2A344A;
+  --soft:#1D2740; --accent:#7FAEFF; --accent-ink:#0F1420; --key:#E8A55C; --good:#5CCB8A;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+img{max-width:100%}
+a{color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto}
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;
+  padding-block:20px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--font-mono);font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);text-decoration:none;font-weight:600}
+.brand span{color:var(--key)}
+nav.main{display:flex;flex-wrap:wrap;gap:4px 6px}
+nav.main a{font-size:.95rem;text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:4px;border:1px solid transparent}
+nav.main a:hover{color:var(--ink);border-color:var(--line)}
+nav.main a[aria-current="page"]{color:var(--accent-ink);background:var(--accent)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{padding-block:48px 32px;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--font-display);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(2.3rem,6vw,3.8rem);font-weight:700}
+h2{font-size:clamp(1.55rem,3.4vw,2rem);font-weight:650;margin-bottom:16px}
+h3{font-size:1.2rem;font-weight:650;margin-bottom:6px}
+p{margin:0 0 14px;max-width:68ch}
+.lead{font-size:1.25rem;line-height:1.5;color:var(--ink);max-width:56ch}
+.eyebrow{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+.muted{color:var(--muted)}
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:40px;align-items:start}
+.hero-text{display:flex;flex-direction:column;gap:20px}
+.hero-text p{margin:0}
+@media (max-width:820px){.hero{grid-template-columns:minmax(0,1fr)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:16px}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.tbl{background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden;min-width:0}
+.tbl-h{font-family:var(--font-mono);font-size:.8rem;letter-spacing:.07em;text-transform:uppercase;background:var(--soft);padding:9px 14px;font-weight:600}
+.row{display:grid;grid-template-columns:2.6rem minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:9px 14px;border-top:1px solid var(--line);font-size:.95rem}
+.row .c{font-family:var(--font-mono);font-size:.9rem;overflow-wrap:anywhere}
+.row .t{font-family:var(--font-mono);font-size:.8rem;color:var(--muted);text-align:right}
+.row.txt{grid-template-columns:4.6rem minmax(0,1fr)}
+.row.txt .c{font-family:var(--font-body);font-size:.97rem}
+.k{font-family:var(--font-mono);font-size:.68rem;font-weight:600;letter-spacing:.04em;border:1px solid currentColor;border-radius:3px;padding:1px 5px;text-align:center;line-height:1.5}
+.k.pk{color:var(--key)} .k.fk{color:var(--accent)} .k.no{color:var(--muted);border-color:var(--line)}
+.er{display:flex;flex-direction:column;gap:10px}
+.rel{font-family:var(--font-mono);font-size:.8rem;color:var(--muted);text-align:center}
+pre{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;overflow-x:auto;
+  font-family:var(--font-mono);font-size:.85rem;line-height:1.55;tab-size:2}
+.cap{font-size:.88rem;color:var(--muted);margin:8px 0 0}
+.card{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px;text-decoration:none;color:var(--ink);min-width:0}
+.card:hover{border-color:var(--accent)}
+.card .arrow{font-family:var(--font-mono);font-size:.8rem;color:var(--accent);margin-top:auto;padding-top:8px}
+.card p{margin:0;color:var(--muted);font-size:.97rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:0;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.stat{padding:18px 20px;border-left:1px solid var(--line);min-width:0}
+.stat:first-child{border-left:0}
+@media (max-width:620px){.stat{border-left:0;border-top:1px solid var(--line)}.stat:first-child{border-top:0}}
+.stat b{display:block;font-family:var(--font-display);font-size:1.7rem;line-height:1.15;font-variant-numeric:tabular-nums}
+.stat span{font-size:.92rem;color:var(--muted)}
+ul.plain{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:8px;max-width:68ch}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;background:var(--surface);border:1px solid var(--line);font-size:.95rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
+th{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;background:var(--soft);border-top:0;font-weight:600;white-space:nowrap}
+.bars{display:flex;flex-direction:column;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px}
+.bar-row{display:grid;grid-template-columns:minmax(0,13rem) minmax(0,1fr) 9.5rem;gap:8px 14px;align-items:center;font-size:.92rem}
+.bar-row .v{font-family:var(--font-mono);font-size:.82rem;text-align:right;font-variant-numeric:tabular-nums}
+.track{position:relative;height:14px;background:var(--soft);border-radius:3px}
+.fill{position:absolute;top:0;bottom:0;background:var(--accent);border-radius:3px}
+.fill.rng{background:var(--key)}
+@media (max-width:640px){.bar-row{grid-template-columns:minmax(0,1fr) auto}.bar-row .track{grid-column:1 / -1;order:3}}
+.axis{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.72rem;color:var(--muted);margin-left:calc(13rem + 14px);margin-right:calc(9.5rem + 14px)}
+@media (max-width:640px){.axis{margin:0}}
+.vac{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px;min-width:0}
+.vac .where{font-size:.9rem;color:var(--muted);margin:0}
+.vac .pay{font-family:var(--font-display);font-size:1.25rem;font-weight:650;margin:0;font-variant-numeric:tabular-nums}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font-family:var(--font-mono);font-size:.74rem;border:1px solid var(--line);border-radius:3px;padding:2px 7px;background:var(--bg)}
+.shot{margin:0;border:1px dashed var(--line);border-radius:4px;overflow:hidden;background:var(--bg)}
+.shot img{display:block;width:100%;height:auto}
+.shot .ph{display:none;padding:18px 14px;font-size:.85rem;color:var(--muted);text-align:center}
+.shot.empty .ph{display:block}
+.shot.empty img{display:none}
+.vac a.src{font-size:.92rem}
+.note{border-left:3px solid var(--key);background:var(--surface);padding:12px 16px;font-size:.95rem;max-width:72ch}
+.note p{margin:0}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;color:var(--accent);flex:none}
+.person{display:flex;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px;min-width:0}
+.person h3{margin-bottom:2px}
+.person .yrs{font-family:var(--font-mono);font-size:.78rem;color:var(--muted);margin:0 0 8px}
+.person p{margin:0 0 8px;font-size:.97rem}
+.award{display:inline-block;font-family:var(--font-mono);font-size:.74rem;color:var(--key);border:1px solid currentColor;border-radius:3px;padding:1px 7px}
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:24px}
+.pager a{font-family:var(--font-mono);font-size:.88rem;text-decoration:none}
+footer.bottom{padding-block:8px 40px;font-size:.88rem;color:var(--muted)}
+footer.bottom p{margin:0 0 6px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:.9rem;color:var(--muted);margin:0 0 16px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+
+/* Второй слой оформления: тёмная «чертёжная» шапка с точечной сеткой, светлое тело страницы. */
+:root{--band:#12203A;--band-ink:#F2F6FD;--band-muted:#B9C5DC;--band-line:rgba(255,255,255,.16);
+  --amber:#F2B45B;--amber-ink:#1B1405;--shadow:0 8px 24px rgba(23,32,51,.10)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--band:#0A0F1B;--shadow:0 8px 24px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--band:#0A0F1B;--shadow:0 8px 24px rgba(0,0,0,.35)}
+body{padding-left:0;padding-right:0}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.band{background-color:var(--band);background-image:radial-gradient(rgba(255,255,255,.10) 1px,transparent 1px);background-size:22px 22px;color:var(--band-ink)}
+.band header.top{border-bottom:1px solid var(--band-line)}
+.band .brand{color:var(--band-ink)} .band .brand span{color:var(--amber)}
+.band nav.main a{color:var(--band-muted)}
+.band nav.main a:hover{color:var(--band-ink);border-color:var(--band-line)}
+.band nav.main a[aria-current="page"]{background:var(--amber);color:var(--amber-ink);font-weight:600}
+.band a:focus-visible{outline-color:var(--amber)}
+.band .intro{padding-block:56px 68px}
+.band h1{color:var(--band-ink);font-size:clamp(2.2rem,6vw,3.4rem)}
+.band.home h1{font-size:clamp(2.6rem,7.5vw,4.6rem);line-height:1.04}
+.band .lead{color:var(--band-muted)}
+.band .eyebrow{color:var(--amber)}
+.band .note{background:rgba(255,255,255,.06);border-left-color:var(--amber);color:var(--band-muted)}
+.band .tbl{background:rgba(255,255,255,.05);border-color:var(--band-line)}
+.band .tbl-h{background:rgba(255,255,255,.09);color:var(--band-ink)}
+.band .row{border-color:var(--band-line)}
+.band .row .t{color:var(--band-muted)}
+.band .k.no{color:var(--band-muted);border-color:var(--band-line)}
+.band .k.pk{color:var(--amber)} .band .k.fk{color:#8DB8FF}
+.rel{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--band-muted)}
+.rel::before,.rel::after{content:"";width:1px;height:14px;background:var(--band-line)}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:4px}
+.btn{display:inline-block;padding:11px 18px;border-radius:4px;background:var(--amber);color:var(--amber-ink);text-decoration:none;font-weight:600;font-size:.98rem;border:1px solid transparent}
+.btn:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent;color:var(--band-ink);border-color:var(--band-line)}
+.btn.ghost:hover{border-color:var(--band-ink);filter:none}
+main{padding-block:56px 40px}
+main h2{border-bottom:1px solid var(--line);padding-bottom:10px}
+.stat b{color:var(--accent);font-size:2rem}
+.card:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.card h3{color:var(--ink)}
+.card .arrow{transition:transform .15s}
+.card:hover .arrow{transform:translateX(4px)}
+.vac .pay{color:var(--accent)}
+.vac{transition:box-shadow .15s}
+.vac:hover{box-shadow:var(--shadow)}
+th,.tbl-h{color:var(--accent)}
+.band .tbl-h{color:var(--band-ink)}
+pre{border-left:3px solid var(--accent)}
+.kw{color:var(--accent);font-weight:600}
+.num{color:var(--key)}
+.avatar{background:var(--band);color:var(--amber);width:56px;height:56px;font-size:1.1rem}
+footer.bottom{border-top:1px solid var(--line);padding-top:20px}
+.pager{border-top:0;padding-top:0}
+
+.row.three{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 3.4rem;font-family:var(--font-body)}
+.row.three.two{grid-template-columns:minmax(0,1fr) 4rem}
+.row.three span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.row.three.head{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.band .row.three.head{color:var(--band-muted)}
+.hero-cap{margin:12px 0 0;font-size:.92rem;color:var(--band-muted)}
+
+/* Живой фон шапки: свечение + canvas с сетью узлов */
+.band{position:relative;overflow:hidden;
+  background-image:radial-gradient(ellipse 60% 95% at 88% 0%,rgba(70,120,230,.34),transparent 66%),
+                   radial-gradient(ellipse 45% 70% at 4% 100%,rgba(242,180,91,.10),transparent 70%),
+                   radial-gradient(rgba(255,255,255,.09) 1px,transparent 1px);
+  background-size:auto,auto,22px 22px}
+.band .wrap{position:relative;z-index:1}
+canvas.live{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+/* Фиолетовая тема. Сайт целиком в одном тёмном мире, значения заданы для всех состояний темы. */
+:root,:root:not([data-theme="light"]),:root[data-theme="dark"],:root[data-theme="light"]{
+  --bg:#120B24; --surface:rgba(27,17,50,.86); --ink:#EFEAFB; --muted:#B6ABD4; --line:#3B2C66;
+  --soft:rgba(124,86,214,.24); --accent:#B794FF; --accent-ink:#1A0F33; --key:#F2B45B; --good:#5CCB8A;
+  --band:rgba(34,18,72,.55); --band-ink:#F6F2FF; --band-muted:#C8BDE6; --band-line:rgba(255,255,255,.16);
+  --amber:#F2B45B; --amber-ink:#1B1405; --shadow:0 10px 28px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+.glow{position:fixed;inset:-12%;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 55% 45% at 78% 8%,rgba(139,92,246,.40),transparent 70%),
+             radial-gradient(ellipse 50% 45% at 8% 92%,rgba(236,72,153,.20),transparent 70%),
+             radial-gradient(ellipse 40% 35% at 50% 55%,rgba(99,102,241,.14),transparent 70%);
+  animation:drift 26s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-4%,3%,0) scale(1.1)}}
+@media (prefers-reduced-motion:reduce){.glow{animation:none}}
+canvas.live{position:fixed;left:0;top:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.band{position:relative;z-index:1;background-color:var(--band);
+  background-image:radial-gradient(ellipse 60% 95% at 88% 0%,rgba(167,110,255,.28),transparent 66%),
+                   radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);
+  background-size:auto,22px 22px}
+.wrap{position:relative;z-index:1}
+.band nav.main a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.band .k.fk{color:var(--accent)}
+.btn{background:linear-gradient(135deg,#B794FF,#E3A9FF);color:#1A0F33}
+.avatar{background:var(--soft);color:var(--accent)}
+.card,.vac,.tbl,.person,.bars,table,pre,.note{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.vw[hidden]{display:none!important}.stack{display:flex;flex-direction:column;gap:56px}</style></head><body><div class="glow" aria-hidden="true"></div><canvas class="live" aria-hidden="true"></canvas><div class="band home"><div class="wrap"><header class="top"><a class="brand" href="#index">DB<span>/</span>developer</a><nav class="main" aria-label="Разделы сайта"><a href="#index">Главная</a><a href="#profession">Профессия</a><a href="#skills">Знания</a><a href="#companies">Компании</a><a href="#market">Вакансии и зарплаты</a><a href="#people">Люди</a></nav></header><div class="intro"><div class="vw" data-view="index" hidden>
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">Профессия в области данных и ИИ</p>
+    <h1>Разработчик баз данных</h1>
+    <p class="lead">Создаёт и настраивает базы данных: места, где приложения хранят информацию. Следит, чтобы данные не терялись и находились быстро: счёт в банке, заказ в магазине, примеры для обучения ИИ.</p>
+    <div class="btns"><a class="btn" href="#market">Вакансии и зарплаты</a><a class="btn ghost" href="#skills">Что нужно знать</a></div>
+  </div>
+  <div>
+    <div class="tbl" role="img" aria-label="Пример таблицы базы данных: студенты, группы и оценки">
+      <div class="tbl-h">Таблица «Студенты»</div>
+      <div class="row three head"><span>ФИО</span><span>Группа</span><span>Оценка</span></div>
+      <div class="row three"><span>Иванов А.</span><span>ИВТ-21</span><span>5</span></div>
+      <div class="row three"><span>Петрова М.</span><span>ИВТ-21</span><span>4</span></div>
+      <div class="row three"><span>Сидоров К.</span><span>ПО-22</span><span>5</span></div>
+      <div class="row three"><span>Орлова Д.</span><span>ПО-22</span><span>3</span></div>
+    </div>
+    <p class="hero-cap">База данных состоит из таких таблиц. Разработчик решает, какие таблицы нужны и как они связаны между собой.</p>
+  </div>
+</section></div><div class="vw" data-view="profession" hidden>
+<section>
+  <p class="eyebrow">Профессия</p>
+  <h1>Кто такой разработчик баз данных</h1>
+  <p class="lead" style="margin-top:20px">Специалист, который создаёт и сопровождает базы данных: продумывает структуру хранения, пишет SQL-запросы и серверную логику и следит, чтобы данные читались и записывались быстро.</p>
+</section></div><div class="vw" data-view="skills" hidden>
+<section>
+  <p class="eyebrow">Необходимые знания</p>
+  <h1>Что нужно знать и уметь</h1>
+  <p class="lead" style="margin-top:20px">Основа профессии: SQL и одна-две СУБД, понимание того, как хранятся данные и почему запрос бывает медленным.</p>
+</section></div><div class="vw" data-view="companies" hidden>
+<section>
+  <p class="eyebrow">Где работают</p>
+  <h1>Компании, где есть такая профессия</h1>
+  <p class="lead" style="margin-top:20px">Разработчики баз данных нужны везде, где много данных: в банках, торговле, логистике, телекоме и компаниях, которые делают сами СУБД.</p>
+</section></div><div class="vw" data-view="market" hidden>
+<section>
+  <p class="eyebrow">Вакансии и зарплаты</p>
+  <h1>Сколько платят в России и за рубежом</h1>
+  <p class="lead" style="margin-top:20px">В российских вакансиях вилки обычно от 80 до 195 тысяч рублей в месяц. В США средняя зарплата разработчика баз данных около 110 тысяч долларов в год, то есть примерно 9 100 долларов в месяц.</p>
+  <div style="height:16px"></div>
+  <div class="note"><p>Сервисы считают зарплаты по-разному: одни берут объявления, другие анкеты сотрудников. Поэтому цифры в разных источниках не совпадают, и здесь они показаны с указанием источника. Вакансии на момент сбора данных, 2 ноября 2026 года, были открыты, но могут закрыться.</p></div>
+</section></div><div class="vw" data-view="people" hidden>
+<section>
+  <p class="eyebrow">Выдающиеся люди</p>
+  <h1>Кто придумал современные базы данных</h1>
+  <p class="lead" style="margin-top:20px">Почти всё, с чем работает разработчик баз данных сегодня, появилось благодаря нескольким исследователям и инженерам.</p>
+</section></div></div></div></div><div class="wrap"><main><div class="vw stack" data-view="index" hidden>
+
+<section>
+  <h2>Как с этим работают: пример запроса</h2>
+  <div class="grid two">
+    <div>
+<pre><span class="kw">SELECT</span> name, grade
+<span class="kw">FROM</span> students
+<span class="kw">WHERE</span> grade = <span class="num">5</span>;</pre>
+      <p class="cap">Запрос на языке SQL. По-русски: «покажи имя и оценку у студентов, у которых оценка 5».</p>
+    </div>
+    <div class="tbl"><div class="tbl-h">Ответ базы</div>
+      <div class="row three head two"><span>name</span><span>grade</span></div>
+      <div class="row three two"><span>Иванов А.</span><span>5</span></div>
+      <div class="row three two"><span>Сидоров К.</span><span>5</span></div>
+    </div>
+  </div>
+  <p style="margin-top:16px">Запрос задаёт вопрос, база отвечает. Разработчик баз данных пишет такие запросы и следит, чтобы они работали быстро даже тогда, когда в таблице миллионы строк.</p>
+</section>
+
+<section>
+  <h2>Что на сайте</h2>
+  <div class="grid">
+    <a class="card" href="#profession"><h3>Профессия</h3><p>Краткое описание, решаемые задачи, уровни и связь с искусственным интеллектом.</p><span class="arrow">открыть →</span></a>
+    <a class="card" href="#skills"><h3>Знания</h3><p>SQL, СУБД, проектирование, производительность и инструменты рядом.</p><span class="arrow">открыть →</span></a>
+    <a class="card" href="#companies"><h3>Компании</h3><p>Где работают разработчики баз данных в России и в мире.</p><span class="arrow">открыть →</span></a>
+    <a class="card" href="#market"><h3>Вакансии и зарплаты</h3><p>Реальные вакансии, вилки в рублях и долларах, сравнение России и США.</p><span class="arrow">открыть →</span></a>
+    <a class="card" href="#people"><h3>Люди</h3><p>Кодд, Чамберлин, Стоунбрейкер, Грей и другие создатели современных баз данных.</p><span class="arrow">открыть →</span></a>
+  </div>
+</section>
+
+<section>
+  <h2>Деньги в двух строках</h2>
+  <div class="stats">
+    <div class="stat"><b>80 000–195 000 ₽</b><span>в месяц: вилки в российских вакансиях, ноябрь 2026</span></div>
+    <div class="stat"><b>≈ $110 000</b><span>в год: средняя в США по Indeed и ZipRecruiter, 2026</span></div>
+    <div class="stat"><b>2–5 лет</b><span>опыта просят в вакансиях на уровни Middle и Senior</span></div>
+  </div>
+  <p class="cap">Подробности и ссылки на источники: <a href="#market">Вакансии и зарплаты</a>.</p>
+</section>
+<div class="pager"><span></span><a href="#profession">Профессия →</a></div></div><div class="vw stack" data-view="profession" hidden>
+
+<section>
+  <h2>Чем он отличается от соседних ролей</h2>
+  <div class="grid">
+    <div class="vac"><h3>Разработчик БД</h3><p class="muted" style="margin:0">Проектирует схему, пишет запросы, процедуры и функции, оптимизирует их.</p></div>
+    <div class="vac"><h3>Администратор БД (DBA)</h3><p class="muted" style="margin:0">Отвечает за работу сервера: установка, права доступа, резервные копии, восстановление.</p></div>
+    <div class="vac"><h3>Инженер данных</h3><p class="muted" style="margin:0">Строит конвейеры, которые собирают данные из разных источников в хранилище.</p></div>
+  </div>
+  <p class="cap">В вакансиях эти роли часто смешаны: объявление «Разработчик/Администратор БД (PostgreSQL)» просит и то и другое.</p>
+</section>
+
+<section>
+  <h2>Решаемые задачи</h2>
+  <div class="tbl">
+    <div class="tbl-h">tasks</div>
+    <div class="row txt"><span class="k pk">1</span><span class="c"><b>Проектирование структуры БД.</b> Таблицы, ключи, связи, типы данных под бизнес-требования.</span></div>
+    <div class="row txt"><span class="k pk">2</span><span class="c"><b>Серверная логика.</b> Хранимые процедуры, функции и триггеры на SQL, PL/pgSQL, T-SQL или PL/SQL.</span></div>
+    <div class="row txt"><span class="k pk">3</span><span class="c"><b>Оптимизация запросов.</b> Поиск узких мест, индексы, разбор планов выполнения.</span></div>
+    <div class="row txt"><span class="k pk">4</span><span class="c"><b>Мониторинг и настройка.</b> Производительность сервера, резервное копирование и восстановление.</span></div>
+    <div class="row txt"><span class="k pk">5</span><span class="c"><b>Загрузка данных (ETL).</b> Импорт информации из структурированных источников.</span></div>
+    <div class="row txt"><span class="k pk">6</span><span class="c"><b>Разбор инцидентов и документация.</b> Помощь при сбоях и описание структуры для команды.</span></div>
+  </div>
+  <p class="cap">Список составлен по текстам реальных вакансий на hh.ru и Хабр Карьере.</p>
+</section>
+
+<section>
+  <h2>Уровни в профессии</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Уровень</th><th>Типичный опыт</th><th>Что поручают</th></tr></thead>
+    <tbody>
+      <tr><td>Junior</td><td>до 2 лет</td><td>Простые запросы, отчёты, правки в существующей схеме под присмотром.</td></tr>
+      <tr><td>Middle</td><td>от 2 лет</td><td>Самостоятельная разработка процедур и функций, оптимизация запросов, репликация и кластеризация.</td></tr>
+      <tr><td>Senior</td><td>от 3–5 лет</td><td>Проектирование схем с нуля, высоконагруженные системы, настройка сервера под нагрузку, наставничество.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Связь с искусственным интеллектом</h2>
+  <p>Модели ИИ учатся и работают на данных. Кто-то должен хранить эти данные, выбирать нужные строки и отдавать их быстро. Это и есть работа разработчика баз данных: он готовит выборки для обучения, следит за качеством и целостностью данных и строит хранилища, из которых берут признаки для моделей.</p>
+  <p>Отдельное направление: векторный поиск. Для расширения pgvector в PostgreSQL и других СУБД с такой функцией разработчик БД хранит эмбеддинги и ищет по ним похожие объекты, а это основа поиска по смыслу и систем рекомендаций.</p>
+</section>
+<div class="pager"><a href="#index">← Главная</a><a href="#skills">Знания →</a></div></div><div class="vw stack" data-view="skills" hidden>
+
+<section>
+  <p class="legend"><span><span class="k pk">обяз.</span> почти в каждой из рассмотренных вакансий</span><span><span class="k fk">плюс</span> указывают как преимущество</span></p>
+  <div class="grid two">
+    <div class="tbl"><div class="tbl-h">язык и субд</div><div class="row txt"><span class="k pk">обяз.</span><span class="c"><b>SQL:</b> запросы, JOIN, агрегаты, подзапросы, оконные функции</span></div><div class="row txt"><span class="k pk">обяз.</span><span class="c"><b>Диалекты:</b> PL/pgSQL, T-SQL, PL/SQL</span></div><div class="row txt"><span class="k pk">обяз.</span><span class="c"><b>PostgreSQL</b></span></div><div class="row txt"><span class="k fk">плюс</span><span class="c">MS SQL Server, Oracle, ClickHouse</span></div></div>
+    <div class="tbl"><div class="tbl-h">проектирование</div><div class="row txt"><span class="k pk">обяз.</span><span class="c">Нормализация и ER-модели</span></div><div class="row txt"><span class="k pk">обяз.</span><span class="c">Типы данных, ограничения, первичные и внешние ключи</span></div><div class="row txt"><span class="k fk">плюс</span><span class="c">JSON и JSONB, слабоструктурированные данные</span></div><div class="row txt"><span class="k fk">плюс</span><span class="c">NoSQL-базы</span></div></div>
+    <div class="tbl"><div class="tbl-h">производительность и надёжность</div><div class="row txt"><span class="k pk">обяз.</span><span class="c">Индексы, планы выполнения, поиск узких мест</span></div><div class="row txt"><span class="k pk">обяз.</span><span class="c">Транзакции, ACID, блокировки</span></div><div class="row txt"><span class="k pk">обяз.</span><span class="c">Резервное копирование и восстановление</span></div><div class="row txt"><span class="k fk">плюс</span><span class="c">Репликация и кластеризация</span></div></div>
+    <div class="tbl"><div class="tbl-h">инструменты рядом</div><div class="row txt"><span class="k pk">обяз.</span><span class="c">Git</span></div><div class="row txt"><span class="k fk">плюс</span><span class="c">Python</span></div><div class="row txt"><span class="k fk">плюс</span><span class="c">Linux, Docker</span></div><div class="row txt"><span class="k fk">плюс</span><span class="c">ETL, очереди сообщений (RabbitMQ)</span></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Как выглядит работа с производительностью</h2>
+  <p>Примеры ниже работают с таблицей заказов <code>orders</code>: у неё есть поля <code>id</code> (номер заказа), <code>customer_id</code> (номер клиента), <code>total</code> (сумма) и <code>created_at</code> (дата).</p>
+<pre><span class="kw">CREATE INDEX</span> idx_orders_customer <span class="kw">ON</span> orders (customer_id);
+
+<span class="kw">EXPLAIN ANALYZE</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> orders <span class="kw">WHERE</span> customer_id = <span class="num">42</span>;</pre>
+  <p class="cap">Индекс по внешнему ключу и проверка плана: используется ли индекс и сколько миллисекунд занял запрос.</p>
+  <div style="height:18px"></div>
+<pre><span class="kw">SELECT</span> customer_id, created_at, total,
+       <span class="kw">SUM</span>(total) <span class="kw">OVER</span> (
+         <span class="kw">PARTITION BY</span> customer_id
+         <span class="kw">ORDER BY</span> created_at
+       ) <span class="kw">AS</span> running_total
+<span class="kw">FROM</span> orders;</pre>
+  <p class="cap">Оконная функция: накопительная сумма заказов по каждому клиенту. В одной из вакансий умение пользоваться такими функциями названо желательным.</p>
+</section>
+
+<section>
+  <h2>Путь в профессию</h2>
+  <ul class="plain">
+    <li>Выучить SQL: выборки, соединения, группировка, подзапросы, оконные функции.</li>
+    <li>Выбрать СУБД и разобраться в ней глубже. В российских вакансиях чаще всего встречается PostgreSQL.</li>
+    <li>Спроектировать и наполнить собственную базу: например, учебный магазин или расписание.</li>
+    <li>Научиться читать планы запросов и работать с индексами, транзакциями и резервными копиями.</li>
+    <li>Освоить Git и один язык программирования, чаще всего Python.</li>
+  </ul>
+</section>
+<div class="pager"><a href="#profession">← Профессия</a><a href="#companies">Компании →</a></div></div><div class="vw stack" data-view="companies" hidden>
+
+<section>
+  <h2>Россия</h2>
+  <div class="grid">
+    <div class="vac"><h3>Яндекс</h3><p class="where">Интернет-компания</p><p style="margin:0;font-size:.97rem">Создала колоночную СУБД ClickHouse для аналитики больших объёмов данных.</p></div><div class="vac"><h3>Postgres Professional</h3><p class="where">Разработчик СУБД</p><p style="margin:0;font-size:.97rem">Развивает российскую сборку Postgres Pro. Вакансии на Хабр Карьере упоминают работу со структурами Postgres и Postgres Pro.</p></div><div class="vac"><h3>TrueConf</h3><p class="where">Программное обеспечение для видеосвязи</p><p style="margin:0;font-size:.97rem">Искала разработчика баз данных PostgreSQL: структура БД, хранимые процедуры, оптимизация.</p></div><div class="vac"><h3>Банки и финтех</h3><p class="where">Сбер, Т-Банк и другие</p><p style="margin:0;font-size:.97rem">Высоконагруженные транзакционные системы, где скорость и целостность данных важнее всего.</p></div><div class="vac"><h3>Ритейл и маркетплейсы</h3><p class="where">Ozon, Wildberries и другие</p><p style="margin:0;font-size:.97rem">Каталоги, заказы и остатки в больших базах, которые нельзя останавливать.</p></div>
+  </div>
+  <p class="cap">Список составлен как пример. Актуальные вакансии каждой компании смотрите на hh.ru и Хабр Карьере.</p>
+</section>
+
+<section>
+  <h2>За рубежом</h2>
+  <div class="grid">
+    <div class="vac"><h3>Oracle</h3><p class="where">Корпорация</p><p style="margin:0;font-size:.97rem">Oracle Database, одна из самых распространённых коммерческих СУБД.</p></div><div class="vac"><h3>Microsoft</h3><p class="where">Корпорация</p><p style="margin:0;font-size:.97rem">SQL Server и язык T-SQL, а также облачная Azure SQL.</p></div><div class="vac"><h3>Amazon Web Services</h3><p class="where">Облачный провайдер</p><p style="margin:0;font-size:.97rem">Управляемые базы Amazon RDS и Aurora для PostgreSQL и MySQL.</p></div><div class="vac"><h3>Google</h3><p class="where">Корпорация</p><p style="margin:0;font-size:.97rem">Cloud SQL, Spanner и BigQuery для транзакций и аналитики.</p></div><div class="vac"><h3>MongoDB</h3><p class="where">Разработчик СУБД</p><p style="margin:0;font-size:.97rem">Документная база данных, самый известный пример NoSQL.</p></div><div class="vac"><h3>Snowflake</h3><p class="where">Облачное хранилище данных</p><p style="margin:0;font-size:.97rem">Платформа аналитики, где SQL остаётся главным языком.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Организации из найденных вакансий</h2>
+  <p>Во время сбора данных открытые позиции с названием Database Developer или SQL Developer нашлись у Syracuse University, Serco и UST в США, а на hh.ru в России нашлась вакансия компании TrueConf. Данные из этих объявлений приведены на странице <a href="#market">Вакансии и зарплаты</a>.</p>
+</section>
+<div class="pager"><a href="#skills">← Знания</a><a href="#market">Вакансии и зарплаты →</a></div></div><div class="vw stack" data-view="market" hidden>
+
+<section>
+  <h2>Россия: вакансии</h2>
+  <div class="grid two">
+    <article class="vac"><div><h3>Разработчик баз данных PostgreSQL</h3><p class="where">TrueConf · офис, Россия</p></div><p class="pay">зарплата не указана</p><div class="tags"><span>SQL</span><span>PostgreSQL</span><span>Python</span><span>MS SQL</span><span>Oracle</span></div><p class="where" style="margin:0">Опыт с PostgreSQL от 2 лет. Структура БД, хранимые процедуры, оптимизация производительности.</p><a class="src" href="https://hh.ru/vacancy/135954455" target="_blank" rel="noopener">Открыть на hh.ru ↗</a><figure class="shot"><img src="img/hh-trueconf.png" alt="Скриншот вакансии TrueConf" loading="lazy"><div class="ph">Скриншот вакансии: положите файл <code>img/hh-trueconf.png</code></div></figure></article><article class="vac"><div><h3>Разработчик баз данных</h3><p class="where">Хабр Карьера · Россия</p></div><p class="pay">120 000–150 000 ₽</p><a class="src" href="https://career.habr.com/vacancies/1000094110" target="_blank" rel="noopener">Открыть на Хабр Карьере ↗</a><figure class="shot"><img src="img/habr-120-150.png" alt="Скриншот вакансии с вилкой 120–150 тысяч" loading="lazy"><div class="ph">Скриншот вакансии: положите файл <code>img/habr-120-150.png</code></div></figure></article><article class="vac"><div><h3>Разработчик/Администратор БД (PostgreSQL)</h3><p class="where">Рекламные web-технологии · Москва, можно удалённо</p></div><p class="pay">80 000–120 000 ₽</p><div class="tags"><span>PostgreSQL</span><span>Backend</span></div><a class="src" href="https://career.habr.com/vacancies/1000027345" target="_blank" rel="noopener">Открыть на Хабр Карьере ↗</a><figure class="shot"><img src="img/habr-80-120.png" alt="Скриншот вакансии с вилкой 80–120 тысяч" loading="lazy"><div class="ph">Скриншот вакансии: положите файл <code>img/habr-80-120.png</code></div></figure></article><article class="vac"><div><h3>Разработчик БД (PostgreSQL, Middle)</h3><p class="where">Логистическая компания · удалённо</p></div><p class="pay">зарплата не указана, у похожих 140 000–195 000 ₽</p><div class="tags"><span>PostgreSQL</span><span>SQL</span><span>Git</span><span>RabbitMQ</span></div><a class="src" href="https://career.habr.com/vacancies/1000168864" target="_blank" rel="noopener">Открыть на Хабр Карьере ↗</a><figure class="shot"><img src="img/habr-middle.png" alt="Скриншот вакансии Middle PostgreSQL" loading="lazy"><div class="ph">Скриншот вакансии: положите файл <code>img/habr-middle.png</code></div></figure></article>
+  </div>
+</section>
+
+<section>
+  <h2>Россия: статистика</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Источник</th><th>Что показывает</th><th>Значение</th></tr></thead>
+    <tbody>
+      <tr><td>Хабр Карьера, вакансия «Разработчик баз данных»</td><td>вилка в объявлении</td><td>120 000–150 000 ₽ в месяц</td></tr>
+      <tr><td>Хабр Карьера, «Разработчик/Администратор БД (PostgreSQL)»</td><td>вилка в объявлении, Москва</td><td>80 000–120 000 ₽ в месяц</td></tr>
+      <tr><td>Хабр Карьера, «Разработчик БД (PostgreSQL, Middle)»</td><td>зарплата не указана, у похожих специалистов</td><td>140 000–195 000 ₽ в месяц</td></tr>
+      <tr><td>WageIndicator, «Разработчики и администраторы баз данных»</td><td>зарплата большинства, 2026</td><td>45 971–71 387 ₽ в месяц</td></tr>
+    </tbody>
+  </table></div>
+  <p class="cap">WageIndicator считает по анкетам для всей профессии, включая регионы и начинающих, поэтому цифры ниже, чем в вакансиях Москвы.</p>
+</section>
+
+<section>
+  <h2>США: вакансии</h2>
+  <div class="grid two">
+    <article class="vac"><div><h3>Database Developer</h3><p class="where">Syracuse University · Syracuse, NY · полный день</p></div><p class="pay">$66 900–$86 000 в год</p><a class="src" href="https://www.indeed.com/salaries/Database-Developer-Salaries" target="_blank" rel="noopener">Страница на Indeed ↗</a><figure class="shot"><img src="img/indeed-syracuse.png" alt="Скриншот вакансии Syracuse University" loading="lazy"><div class="ph">Скриншот вакансии: положите файл <code>img/indeed-syracuse.png</code></div></figure></article><article class="vac"><div><h3>SQL Developer</h3><p class="where">Serco · Washington Navy Yard, DC · полный день</p></div><p class="pay">$85 032–$162 979 в год</p><a class="src" href="https://www.indeed.com/salaries/SQL+Developer-Salaries" target="_blank" rel="noopener">Страница на Indeed ↗</a><figure class="shot"><img src="img/indeed-serco.png" alt="Скриншот вакансии Serco" loading="lazy"><div class="ph">Скриншот вакансии: положите файл <code>img/indeed-serco.png</code></div></figure></article><article class="vac"><div><h3>SQL Developer, Healthcare</h3><p class="where">UST · Meridian, ID</p></div><p class="pay">$82 000–$123 000 в год</p><a class="src" href="https://www.indeed.com/salaries/SQL-Developer-Salaries" target="_blank" rel="noopener">Страница на Indeed ↗</a><figure class="shot"><img src="img/indeed-ust.png" alt="Скриншот вакансии UST" loading="lazy"><div class="ph">Скриншот вакансии: положите файл <code>img/indeed-ust.png</code></div></figure></article>
+  </div>
+</section>
+
+<section>
+  <h2>США: статистика, доллары в год</h2>
+  <div class="bars" role="img" aria-label="Сравнение средних и диапазонов зарплат разработчика баз данных в США по пяти источникам">
+    <div class="bar-row"><span>ZipRecruiter, Junior</span><div class="track"><div class="fill" style="left:0;width:37.0%"></div></div><span class="v">$66 690</span></div><div class="bar-row"><span>ZipRecruiter, среднее</span><div class="track"><div class="fill" style="left:0;width:61.4%"></div></div><span class="v">$110 489</span></div><div class="bar-row"><span>Indeed, среднее</span><div class="track"><div class="fill" style="left:0;width:60.9%"></div></div><span class="v">$109 635</span></div><div class="bar-row"><span>Glassdoor, 25–75%</span><div class="track"><div class="fill rng" style="left:60.5%;width:27.2%"></div></div><span class="v">$108 905–$157 807</span></div><div class="bar-row"><span>Salary.com, среднее</span><div class="track"><div class="fill" style="left:0;width:92.6%"></div></div><span class="v">$166 751</span></div>
+    <div class="axis"><span>$0</span><span>$90 000</span><span>$180 000</span></div>
+  </div>
+  <p class="cap">Синие полосы показывают среднее значение, оранжевая показывает диапазон от 25-го до 75-го процентиля. Данные за июль–октябрь 2026 года.</p>
+</section>
+
+<section>
+  <h2>Другие страны</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Страна</th><th>Источник</th><th>Зарплата большинства, 2026</th></tr></thead>
+    <tbody>
+      <tr><td>Казахстан</td><td>WageIndicator, «Разработчики и администраторы баз данных»</td><td>357 814–780 701 ₸ в месяц</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Выводы</h2>
+  <ul class="plain">
+    <li>Российские вакансии с указанной вилкой дают 80–150 тысяч рублей, а похожим специалистам уровня Middle оценивают 140–195 тысяч.</li>
+    <li>В США начинающий разработчик получает в среднем около 67 тысяч долларов в год, опытный до 158–167 тысяч, в зависимости от источника.</li>
+    <li>Ставка зависит от СУБД, города и отрасли: финансовый сектор платит заметно выше рынка.</li>
+    <li>Прямое сравнение в одной валюте требует актуального курса, поэтому здесь суммы оставлены в исходных валютах.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Источники</h2>
+  <ul class="plain">
+    <li><a href="https://hh.ru/vacancy/135954455" target="_blank" rel="noopener">hh.ru: вакансия TrueConf</a></li>
+    <li><a href="https://career.habr.com/vacancies/1000094110" target="_blank" rel="noopener">Хабр Карьера: Разработчик баз данных</a></li>
+    <li><a href="https://career.habr.com/vacancies/1000027345" target="_blank" rel="noopener">Хабр Карьера: Разработчик/Администратор БД (PostgreSQL)</a></li>
+    <li><a href="https://career.habr.com/vacancies/1000168864" target="_blank" rel="noopener">Хабр Карьера: Разработчик БД (PostgreSQL, Middle)</a></li>
+    <li><a href="https://wageindicator.org/ru-ru/rabota-v-rossii/rabota-i-zarplata/rossija-razrabotchiki-i-administratory-baz-dannyh" target="_blank" rel="noopener">WageIndicator, Россия</a></li>
+    <li><a href="https://wageindicator.org/ru-kz/rabota-v-kazakhstane/rabota-i-oplata/kazahstan-razrabotchiki-i-administratory-baz-dannyh" target="_blank" rel="noopener">WageIndicator, Казахстан</a></li>
+    <li><a href="https://www.indeed.com/salaries/Database-Developer-Salaries" target="_blank" rel="noopener">Indeed: Database Developer</a></li>
+    <li><a href="https://www.ziprecruiter.com/Salaries/Database-Developer-Salary" target="_blank" rel="noopener">ZipRecruiter: Database Developer</a> и <a href="https://www.ziprecruiter.com/Salaries/Junior-Database-Developer-Salary" target="_blank" rel="noopener">Junior Database Developer</a></li>
+    <li><a href="https://www.glassdoor.com/Salaries/SQL-Database-Developer-salary-SRCH_KO0,22.htm" target="_blank" rel="noopener">Glassdoor: SQL Database Developer</a></li>
+    <li><a href="https://www.salary.com/research/salary/recruiting/sql-database-developer-salary" target="_blank" rel="noopener">Salary.com: SQL Database Developer</a></li>
+  </ul>
+</section>
+<div class="pager"><a href="#companies">← Компании</a><a href="#people">Люди →</a></div></div><div class="vw stack" data-view="people" hidden>
+
+<section>
+  <div class="grid two">
+    <div class="person"><div class="avatar" aria-hidden="true">ЭК</div><div><h3>Эдгар Кодд</h3><p class="yrs">1923–2003</p><p><b>Автор реляционной модели данных</b></p><p>Работал в IBM. В 1970 году опубликовал статью, в которой предложил хранить данные в виде связанных таблиц. На этой идее построены почти все современные СУБД.</p><span class="award">Премия Тьюринга, 1981</span></div></div><div class="person"><div class="avatar" aria-hidden="true">ДЧ</div><div><h3>Дональд Чамберлин и Рэймонд Бойс</h3><p class="yrs">Чамберлин род. 1944, Бойс 1947–1974</p><p><b>Создатели языка SEQUEL, позже SQL</b></p><p>Разработали в IBM язык запросов к реляционным базам. Сегодня SQL остаётся главным языком работы с данными.</p></div></div><div class="person"><div class="avatar" aria-hidden="true">МС</div><div><h3>Майкл Стоунбрейкер</h3><p class="yrs">род. 1943</p><p><b>Создатель Ingres и Postgres</b></p><p>Возглавил проекты Ingres и Postgres. Из Postgres выросла СУБД PostgreSQL, которую сегодня используют в банках, ритейле и облаках.</p><span class="award">Премия Тьюринга, 2014</span></div></div><div class="person"><div class="avatar" aria-hidden="true">ДГ</div><div><h3>Джим Грей</h3><p class="yrs">род. 1944, пропал в море в 2007</p><p><b>Теоретик транзакций</b></p><p>Описал принципы надёжной обработки транзакций, на которых держатся банковские системы и свойства ACID.</p><span class="award">Премия Тьюринга, 1998</span></div></div><div class="person"><div class="avatar" aria-hidden="true">ЛЭ</div><div><h3>Ларри Эллисон</h3><p class="yrs">род. 1944</p><p><b>Сооснователь Oracle</b></p><p>Вместе с коллегами основал компанию, которая выпустила одну из первых коммерческих реляционных СУБД, ставшую Oracle Database.</p></div></div>
+  </div>
+  <p class="cap">Фотографии не размещены намеренно. При желании портреты можно добавить, например, из Википедии, с указанием авторства.</p>
+</section>
+
+<section>
+  <h2>Как это связано между собой</h2>
+  <ul class="plain">
+    <li>В 1970 году Кодд предложил реляционную модель, где данные лежат в таблицах и связаны ключами.</li>
+    <li>Чамберлин и Бойс в IBM создали язык запросов к такой модели, будущий SQL.</li>
+    <li>Грей описал, как сделать операции над данными надёжными: так появились транзакции.</li>
+    <li>Стоунбрейкер построил Ingres и Postgres, и от Postgres произошла современная PostgreSQL, самая частая СУБД в российских вакансиях.</li>
+    <li>Эллисон основал Oracle, превратив реляционные базы в массовый коммерческий продукт.</li>
+  </ul>
+</section>
+<div class="pager"><a href="#market">← Вакансии и зарплаты</a></div></div></main><footer class="bottom"><p>Практическая работа №3 · «История развития и современные тренды искусственного интеллекта» · ДГТУ, 02.03.03</p><p>Данные о зарплатах и вакансиях собраны 2 ноября 2026 года и могут измениться.</p></footer></div><script>document.querySelectorAll('.shot img').forEach(function(i){function f(){i.parentNode.classList.add('empty');}if(i.complete&&i.naturalWidth===0)f();i.addEventListener('error',f);});</script><script>
+(function(){
+var cv=document.querySelector('canvas.live');
+if(!cv||!cv.getContext)return;
+var ctx=cv.getContext('2d'),W=0,H=0,nodes=[],pulses=[],edges=[],mouse={x:-999,y:-999};
+var running=false,last=0,spawnAt=0,LINK=150,raf=0;
+var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var amber=(getComputedStyle(document.documentElement).getPropertyValue('--amber')||'').trim()||'#F2B45B';
+function resize(){
+  var w=window.innerWidth,h=window.innerHeight;
+  if(w===W&&Math.abs(h-H)<120&&H>0)return;
+  W=w;H=h;
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+  var n=Math.max(22,Math.min(90,Math.round(W*H/12000)));
+  while(nodes.length<n)nodes.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1.2+Math.random()*1.8});
+  nodes.length=n;
+  nodes.forEach(function(p){if(p.x>W)p.x=Math.random()*W;if(p.y>H)p.y=Math.random()*H;});
+  draw();
+}
+function step(dt){
+  nodes.forEach(function(p){
+    var dx=p.x-mouse.x,dy=p.y-mouse.y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<130&&d>0.1){var f=(130-d)/130*0.05*dt;p.vx+=dx/d*f;p.vy+=dy/d*f;}
+    p.vx*=0.995;p.vy*=0.995;
+    var s=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+    if(s<0.06){p.vx+=(Math.random()-.5)*0.02;p.vy+=(Math.random()-.5)*0.02;}
+    if(s>0.9){p.vx*=0.9/s;p.vy*=0.9/s;}
+    p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.x<0||p.x>W){p.vx*=-1;p.x=Math.max(0,Math.min(W,p.x));}
+    if(p.y<0||p.y>H){p.vy*=-1;p.y=Math.max(0,Math.min(H,p.y));}
+  });
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  edges.length=0;
+  ctx.lineWidth=1;
+  for(var i=0;i<nodes.length;i++){
+    var a=nodes[i];
+    for(var j=i+1;j<nodes.length;j++){
+      var b=nodes[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<LINK){
+        ctx.strokeStyle='rgba(190,150,255,'+((1-d/LINK)*0.26).toFixed(3)+')';
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+        edges.push([a,b]);
+      }
+    }
+    var mx=a.x-mouse.x,my=a.y-mouse.y,md=Math.sqrt(mx*mx+my*my);
+    if(md<170){
+      ctx.strokeStyle='rgba(242,180,91,'+((1-md/170)*0.5).toFixed(3)+')';
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();
+    }
+  }
+  ctx.fillStyle='rgba(226,208,255,0.6)';
+  nodes.forEach(function(p){ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.2832);ctx.fill();});
+  ctx.shadowColor=amber;ctx.shadowBlur=14;ctx.fillStyle=amber;
+  for(var k=pulses.length-1;k>=0;k--){
+    var q=pulses[k],ddx=q.a.x-q.b.x,ddy=q.a.y-q.b.y;
+    if(q.t>=1||Math.sqrt(ddx*ddx+ddy*ddy)>LINK){pulses.splice(k,1);continue;}
+    var x=q.a.x+(q.b.x-q.a.x)*q.t,y=q.a.y+(q.b.y-q.a.y)*q.t;
+    ctx.globalAlpha=Math.sin(q.t*Math.PI);
+    ctx.beginPath();ctx.arc(x,y,2.6,0,6.2832);ctx.fill();
+  }
+  ctx.globalAlpha=1;ctx.shadowBlur=0;
+}
+function frame(ts){
+  if(!running)return;
+  var dt=Math.min(50,ts-(last||ts))/16.7;last=ts;
+  step(dt);
+  pulses.forEach(function(q){q.t+=0.014*dt;});
+  if(ts>spawnAt&&edges.length&&pulses.length<8){
+    var e=edges[Math.floor(Math.random()*edges.length)];
+    pulses.push({a:e[0],b:e[1],t:0});spawnAt=ts+400+Math.random()*500;
+  }
+  draw();
+  raf=requestAnimationFrame(frame);
+}
+function start(){if(reduce||running)return;running=true;last=0;raf=requestAnimationFrame(frame);}
+function stop(){running=false;cancelAnimationFrame(raf);}
+window.addEventListener('pointermove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;});
+document.documentElement.addEventListener('mouseleave',function(){mouse.x=-999;mouse.y=-999;});
+window.addEventListener('resize',resize);
+document.addEventListener('visibilitychange',function(){if(document.hidden)stop();else start();});
+resize();start();
+})();
+</script><script>
+(function(){
+var views=document.querySelectorAll('.vw'),links=document.querySelectorAll('nav.main a'),band=document.querySelector('.band');
+var titles={"index":"Разработчик баз данных","profession":"Профессия: разработчик БД","skills":"Знания разработчика БД","companies":"Компании для разработчика БД","market":"Вакансии и зарплаты","people":"Создатели баз данных"};
+function show(){
+  var h=(location.hash||'#index').slice(1);if(!titles[h])h='index';
+  views.forEach(function(v){v.hidden=v.getAttribute('data-view')!==h;});
+  links.forEach(function(a){if(a.getAttribute('href')==='#'+h)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  band.classList.toggle('home',h==='index');band.classList.toggle('sub',h!=='index');
+  document.title=titles[h];window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',show);show();
+})();
+</script></body></html>
